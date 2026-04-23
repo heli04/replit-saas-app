@@ -39,8 +39,8 @@ export function RevenuePage() {
     <Shell>
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Revenue</h1>
-          <p className="text-muted-foreground mt-1">Detailed breakdown of your income streams.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Revenue</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Detailed breakdown of your income streams.</p>
         </div>
 
         <Card>

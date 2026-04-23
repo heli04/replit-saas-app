@@ -93,11 +93,11 @@ export function OverviewPage() {
     <Shell>
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
-          <p className="text-muted-foreground mt-1">Your SaaS business at a glance.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Overview</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Your SaaS business at a glance.</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard title="Monthly Recurring Revenue" icon={DollarSign} isLoading={isMetricsLoading} data={metrics?.mrr} />
           <StatCard title="Active Customers" icon={Users} isLoading={isMetricsLoading} data={metrics?.activeUsers} />
           <StatCard title="Revenue Churn Rate" icon={Activity} isLoading={isMetricsLoading} data={metrics?.churnRate} />

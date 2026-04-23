@@ -83,15 +83,15 @@ export function CustomersPage() {
   return (
     <Shell>
       <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-            <p className="text-muted-foreground mt-1">Manage your active and inactive subscribers.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Customers</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage your active and inactive subscribers.</p>
           </div>
           
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <UserPlus className="mr-2 h-4 w-4" />
                 Add Customer
               </Button>
@@ -198,8 +198,8 @@ export function CustomersPage() {
           </Dialog>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="relative flex-1 sm:max-w-sm">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -210,9 +210,9 @@ export function CustomersPage() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+            <SlidersHorizontal className="h-4 w-4 text-muted-foreground shrink-0" />
             <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
-              <SelectTrigger className="w-[140px] bg-card">
+              <SelectTrigger className="w-full sm:w-[140px] bg-card">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -224,7 +224,7 @@ export function CustomersPage() {
           </div>
         </div>
 
-        <div className="rounded-md border border-border bg-card overflow-hidden">
+        <div className="rounded-md border border-border bg-card overflow-x-auto">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
@@ -260,7 +260,7 @@ export function CustomersPage() {
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium text-foreground">{customer.name}</span>
-                        <span className="text-xs text-muted-foreground">{customer.email}</span>
+                        <span className="text-xs text-muted-foreground truncate max-w-[200px]">{customer.email}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -272,17 +272,17 @@ export function CustomersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="capitalize text-muted-foreground">{customer.plan}</TableCell>
-                    <TableCell className="text-right font-medium">
+                    <TableCell className="text-right font-medium whitespace-nowrap">
                       ${customer.mrr.toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-right text-muted-foreground text-sm">
+                    <TableCell className="text-right text-muted-foreground text-sm whitespace-nowrap">
                       {format(new Date(customer.createdAt), 'MMM d, yyyy')}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 
                         variant="secondary" 
                         size="sm" 
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="md:opacity-0 md:group-hover:opacity-100 transition-opacity whitespace-nowrap"
                         onClick={() => setLocation(`/customers/${customer.id}`)}
                       >
                         View Details

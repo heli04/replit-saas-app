@@ -74,10 +74,10 @@ export function CustomerDetailPage() {
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
-          <div className="flex-1 flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold tracking-tight">{customer.name}</h1>
+          <div className="flex-1 min-w-0 flex justify-between items-center">
+            <div className="min-w-0">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{customer.name}</h1>
                 <Badge 
                   variant={customer.status === "active" ? "default" : "secondary"}
                   className={customer.status === "active" ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 shadow-none border-0" : ""}
@@ -85,15 +85,15 @@ export function CustomerDetailPage() {
                   {customer.status}
                 </Badge>
               </div>
-              <p className="text-muted-foreground mt-1 flex items-center gap-1">
-                <Mail className="h-3.5 w-3.5" />
-                {customer.email}
+              <p className="text-muted-foreground mt-1 flex items-center gap-1 text-sm sm:text-base">
+                <Mail className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{customer.email}</span>
               </p>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -131,14 +131,14 @@ export function CustomerDetailPage() {
             </Card>
           </div>
 
-          <div className="md:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             <Card className="bg-primary text-primary-foreground border-0">
               <CardContent className="p-6 flex flex-col justify-center min-h-[140px]">
                 <div className="flex items-center gap-2 mb-2 text-primary-foreground/80">
                   <DollarSign className="h-5 w-5" />
                   <span className="font-medium">Lifetime Value</span>
                 </div>
-                <div className="text-5xl font-bold tracking-tight">
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight break-all">
                   {formatCurrency(lifetimeValue)}
                 </div>
               </CardContent>
@@ -149,7 +149,7 @@ export function CustomerDetailPage() {
                 <CardTitle>Recent Revenue</CardTitle>
                 <CardDescription>Payment history for this customer</CardDescription>
               </CardHeader>
-              <CardContent className="p-0">
+              <CardContent className="p-0 overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
