@@ -3,20 +3,25 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: SaaS Analytics API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: metrics
+    description: Dashboard metrics
+  - name: customers
+    description: Customer management
+  - name: revenue
+    description: Revenue logs
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +29,253 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /metrics/overview:
+    get:
+      operationId: getOverviewMetrics
+      tags: [metrics]
+      summary: Get overview KPI cards
+      responses:
+        "200":
+          description: Overview metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OverviewMetrics"
+
+  /metrics/revenue-series:
+    get:
+      operationId: getRevenueSeries
+      tags: [metrics]
+      summary: Monthly revenue for the last 12 months
+      responses:
+        "200":
+          description: Revenue series
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RevenuePoint"
+
+  /metrics/plan-breakdown:
+    get:
+      operationId: getPlanBreakdown
+      tags: [metrics]
+      summary: Active customer counts grouped by plan
+      responses:
+        "200":
+          description: Plan breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlanBreakdownItem"
+
+  /metrics/recent-activity:
+    get:
+      operationId: getRecentActivity
+      tags: [metrics]
+      summary: Recent revenue & customer events
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /customers:
+    get:
+      operationId: listCustomers
+      tags: [customers]
+      summary: List customers (optionally filtered by search query)
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [active, inactive, all]
+      responses:
+        "200":
+          description: Customers list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+    post:
+      operationId: createCustomer
+      tags: [customers]
+      summary: Create a customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomerInput"
+      responses:
+        "201":
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+
+  /customers/{id}:
+    get:
+      operationId: getCustomer
+      tags: [customers]
+      summary: Get customer details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Customer detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerDetail"
+
+  /revenue:
+    get:
+      operationId: listRevenueLogs
+      tags: [revenue]
+      summary: List recent revenue log entries
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Revenue logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RevenueLog"
+
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
+        status: { type: string }
+      required: [status]
 
+    TrendDirection:
+      type: string
+      enum: [up, down, flat]
+
+    StatCard:
+      type: object
+      properties:
+        label: { type: string }
+        value: { type: number }
+        format:
+          type: string
+          enum: [currency, number, percent]
+        deltaPercent: { type: number }
+        trend: { $ref: "#/components/schemas/TrendDirection" }
+        positiveIsGood: { type: boolean }
+      required: [label, value, format, deltaPercent, trend, positiveIsGood]
+
+    OverviewMetrics:
+      type: object
+      properties:
+        mrr: { $ref: "#/components/schemas/StatCard" }
+        activeUsers: { $ref: "#/components/schemas/StatCard" }
+        churnRate: { $ref: "#/components/schemas/StatCard" }
+        avgRevenue: { $ref: "#/components/schemas/StatCard" }
+      required: [mrr, activeUsers, churnRate, avgRevenue]
+
+    RevenuePoint:
+      type: object
+      properties:
+        month: { type: string, description: "YYYY-MM" }
+        label: { type: string, description: "Short month label e.g. Jan" }
+        revenue: { type: number }
+      required: [month, label, revenue]
+
+    PlanBreakdownItem:
+      type: object
+      properties:
+        plan: { type: string }
+        customers: { type: integer }
+        revenue: { type: number }
+      required: [plan, customers, revenue]
+
+    ActivityItem:
+      type: object
+      properties:
+        id: { type: string }
+        type:
+          type: string
+          enum: [signup, payment, churn, upgrade]
+        customerName: { type: string }
+        amount: { type: number, nullable: true }
+        occurredAt: { type: string, format: date-time }
+      required: [id, type, customerName, occurredAt]
+
+    CustomerStatus:
+      type: string
+      enum: [active, inactive]
+
+    Customer:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        status: { $ref: "#/components/schemas/CustomerStatus" }
+        plan: { type: string }
+        mrr: { type: number }
+        createdAt: { type: string, format: date-time }
+      required: [id, name, email, status, plan, mrr, createdAt]
+
+    CreateCustomerInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string }
+        status: { $ref: "#/components/schemas/CustomerStatus" }
+        plan: { type: string }
+        mrr: { type: number }
+      required: [name, email, status, plan, mrr]
+
+    CustomerDetail:
+      type: object
+      properties:
+        customer: { $ref: "#/components/schemas/Customer" }
+        lifetimeValue: { type: number }
+        recentRevenue:
+          type: array
+          items:
+            $ref: "#/components/schemas/RevenueLog"
+      required: [customer, lifetimeValue, recentRevenue]
+
+    RevenueLog:
+      type: object
+      properties:
+        id: { type: integer }
+        customerId: { type: integer }
+        customerName: { type: string }
+        amount: { type: number }
+        type:
+          type: string
+          enum: [subscription, one_time, refund]
+        occurredAt: { type: string, format: date-time }
+      required: [id, customerId, customerName, amount, type, occurredAt]
