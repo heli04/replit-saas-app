@@ -16,11 +16,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   return (
-    <div className="flex min-h-screen w-full bg-background text-foreground">
+    <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
       {/* Sidebar */}
       <aside 
         className={cn(
-          "flex flex-col border-r bg-sidebar border-sidebar-border transition-all duration-300",
+          "flex flex-col border-r bg-sidebar border-sidebar-border transition-all duration-300 h-screen sticky top-0 shrink-0",
           isCollapsed ? "w-16" : "w-64"
         )}
       >
