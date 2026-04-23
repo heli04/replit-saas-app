@@ -105,18 +105,18 @@ export function OverviewPage() {
         </div>
 
         <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
-          <Card className="lg:col-span-4">
+          <Card className="lg:col-span-4 flex flex-col">
             <CardHeader>
               <CardTitle>Revenue Overview</CardTitle>
               <CardDescription>Trailing 12 months MRR growth</CardDescription>
             </CardHeader>
-            <CardContent className="pl-0">
+            <CardContent className="pl-0 flex-1">
               {isRevenueLoading ? (
-                <div className="h-[300px] w-full flex items-center justify-center">
-                  <Skeleton className="h-[280px] w-full ml-6" />
+                <div className="h-[320px] w-full flex items-center justify-center">
+                  <Skeleton className="h-[300px] w-full ml-6" />
                 </div>
               ) : (
-                <div className="h-[300px] w-full">
+                <div className="h-[320px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={revenueSeries} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <defs>
@@ -152,6 +152,7 @@ export function OverviewPage() {
                         strokeWidth={2}
                         fillOpacity={1} 
                         fill="url(#colorRevenue)" 
+                        isAnimationActive={false}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -160,95 +161,93 @@ export function OverviewPage() {
             </CardContent>
           </Card>
 
-          <div className="lg:col-span-3 flex flex-col gap-4">
-            <Card className="flex-1">
-              <CardHeader>
-                <CardTitle>Plan Breakdown</CardTitle>
-                <CardDescription>Active customers by subscription tier</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isPlansLoading ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map(i => <Skeleton key={i} className="h-10 w-full" />)}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {planBreakdown?.map((plan) => (
-                      <div key={plan.plan} className="flex items-center justify-between">
-                        <div className="flex flex-col">
-                          <span className="font-medium capitalize">{plan.plan}</span>
-                          <span className="text-xs text-muted-foreground">{plan.customers} customers</span>
-                        </div>
-                        <div className="font-medium">
-                          {formatCurrency(plan.revenue)}
-                        </div>
+          <Card className="lg:col-span-3 flex flex-col">
+            <CardHeader>
+              <CardTitle>Plan Breakdown</CardTitle>
+              <CardDescription>Active customers by subscription tier</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1">
+              {isPlansLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-10 w-full" />)}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {planBreakdown?.map((plan) => (
+                    <div key={plan.plan} className="flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <span className="font-medium capitalize">{plan.plan}</span>
+                        <span className="text-xs text-muted-foreground">{plan.customers} customers</span>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="flex-1">
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest customer events</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isActivityLoading ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="flex items-center gap-3">
-                        <Skeleton className="h-8 w-8 rounded-full" />
-                        <div className="flex-1 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
+                      <div className="font-medium">
+                        {formatCurrency(plan.revenue)}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {recentActivity?.map((activity) => {
-                      let Icon = Activity;
-                      let colorClass = "text-muted-foreground bg-muted";
-                      let actionText = "";
-                      
-                      if (activity.type === 'signup') {
-                        Icon = UserPlus; colorClass = "text-emerald-500 bg-emerald-500/10"; actionText = "signed up";
-                      } else if (activity.type === 'payment') {
-                        Icon = CreditCard; colorClass = "text-blue-500 bg-blue-500/10"; actionText = "made a payment";
-                      } else if (activity.type === 'churn') {
-                        Icon = ArrowDownCircle; colorClass = "text-destructive bg-destructive/10"; actionText = "canceled their subscription";
-                      } else if (activity.type === 'upgrade') {
-                        Icon = ArrowUpCircle; colorClass = "text-primary bg-primary/10"; actionText = "upgraded their plan";
-                      }
-
-                      return (
-                        <div key={activity.id} className="flex items-center gap-3">
-                          <div className={cn("p-2 rounded-full", colorClass)}>
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1 flex justify-between items-center min-w-0">
-                            <div className="flex flex-col truncate pr-2">
-                              <span className="text-sm font-medium truncate">{activity.customerName}</span>
-                              <span className="text-xs text-muted-foreground truncate">{actionText}</span>
-                            </div>
-                            <div className="flex flex-col items-end whitespace-nowrap">
-                              {activity.amount && (
-                                <span className="text-sm font-medium">{formatCurrency(activity.amount)}</span>
-                              )}
-                              <span className="text-xs text-muted-foreground">
-                                {format(new Date(activity.occurredAt), 'MMM d, h:mm a')}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Latest customer events</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isActivityLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="flex items-center gap-3">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <div className="flex-1 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {recentActivity?.slice(0, 8).map((activity) => {
+                  let Icon = Activity;
+                  let colorClass = "text-muted-foreground bg-muted";
+                  let actionText = "";
+
+                  if (activity.type === 'signup') {
+                    Icon = UserPlus; colorClass = "text-emerald-500 bg-emerald-500/10"; actionText = "signed up";
+                  } else if (activity.type === 'payment') {
+                    Icon = CreditCard; colorClass = "text-blue-500 bg-blue-500/10"; actionText = "made a payment";
+                  } else if (activity.type === 'churn') {
+                    Icon = ArrowDownCircle; colorClass = "text-destructive bg-destructive/10"; actionText = "canceled their subscription";
+                  } else if (activity.type === 'upgrade') {
+                    Icon = ArrowUpCircle; colorClass = "text-primary bg-primary/10"; actionText = "upgraded their plan";
+                  }
+
+                  return (
+                    <div key={activity.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                      <div className={cn("p-2 rounded-full shrink-0", colorClass)}>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 flex justify-between items-center min-w-0 gap-3">
+                        <div className="flex flex-col truncate min-w-0">
+                          <span className="text-sm font-medium truncate">{activity.customerName}</span>
+                          <span className="text-xs text-muted-foreground truncate">{actionText}</span>
+                        </div>
+                        <div className="flex flex-col items-end whitespace-nowrap shrink-0">
+                          {activity.amount != null && (
+                            <span className="text-sm font-medium">{formatCurrency(activity.amount)}</span>
+                          )}
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(activity.occurredAt), 'MMM d, h:mm a')}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </Shell>
   );
