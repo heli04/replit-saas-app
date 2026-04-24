@@ -9,10 +9,13 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Menu,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
+import { useLogout } from "@workspace/api-client-react";
+import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
@@ -75,9 +78,59 @@ function NavList({
   );
 }
 
+function UserSummary({ collapsed }: { collapsed?: boolean }) {
+  const { user } = useAuth();
+  if (!user) return null;
+  const initials = user.name
+    .split(" ")
+    .map((s) => s[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  if (collapsed) {
+    return (
+      <div
+        className="w-8 h-8 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-medium mx-auto"
+        title={`${user.name} (${user.email})`}
+      >
+        {initials}
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2 px-2 py-1.5 min-w-0">
+      <div className="w-8 h-8 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-medium shrink-0">
+        {initials}
+      </div>
+      <div className="min-w-0">
+        <div className="text-sm font-medium truncate">{user.name}</div>
+        <div className="text-xs text-muted-foreground truncate">{user.email}</div>
+      </div>
+    </div>
+  );
+}
+
 export function Shell({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [, navigate] = useLocation();
+  const { signOutLocal } = useAuth();
+
+  const logoutMutation = useLogout({
+    mutation: {
+      onSettled: () => {
+        signOutLocal();
+        setMobileOpen(false);
+        navigate("/login", { replace: true });
+      },
+    },
+  });
+
+  const handleLogout = () => {
+    if (logoutMutation.isPending) return;
+    logoutMutation.mutate();
+  };
 
   return (
     <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
@@ -111,6 +164,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               </>
             )}
           </Button>
+          <UserSummary collapsed={isCollapsed} />
           <Button
             variant="ghost"
             size={isCollapsed ? "icon" : "sm"}
@@ -119,9 +173,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
               isCollapsed && "justify-center",
             )}
             title={isCollapsed ? "Log out" : undefined}
+            onClick={handleLogout}
+            disabled={logoutMutation.isPending}
           >
-            <LogOut className="h-4 w-4 mr-2" />
-            {!isCollapsed && "Log out"}
+            {logoutMutation.isPending ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <LogOut className="h-4 w-4 mr-2" />
+            )}
+            {!isCollapsed && (logoutMutation.isPending ? "Signing out…" : "Log out")}
           </Button>
         </div>
       </aside>
@@ -145,13 +205,21 @@ export function Shell({ children }: { children: React.ReactNode }) {
               </SheetHeader>
               <div className="flex flex-col h-[calc(100vh-3.5rem)]">
                 <NavList onNavigate={() => setMobileOpen(false)} />
-                <div className="p-2 mt-auto border-t border-sidebar-border/50">
+                <div className="p-2 mt-auto border-t border-sidebar-border/50 flex flex-col gap-2">
+                  <UserSummary />
                   <Button
                     variant="ghost"
                     size="sm"
                     className="w-full text-sidebar-foreground/60 justify-start hover:text-destructive hover:bg-destructive/10"
+                    onClick={handleLogout}
+                    disabled={logoutMutation.isPending}
                   >
-                    <LogOut className="h-4 w-4 mr-2" /> Log out
+                    {logoutMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <LogOut className="h-4 w-4 mr-2" />
+                    )}
+                    {logoutMutation.isPending ? "Signing out…" : "Log out"}
                   </Button>
                 </div>
               </div>

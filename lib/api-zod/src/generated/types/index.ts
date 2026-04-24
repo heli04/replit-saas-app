@@ -8,6 +8,8 @@
 
 export * from "./activityItem";
 export * from "./activityItemType";
+export * from "./authError";
+export * from "./authUser";
 export * from "./createCustomerInput";
 export * from "./customer";
 export * from "./customerDetail";
@@ -16,6 +18,7 @@ export * from "./healthStatus";
 export * from "./listCustomersParams";
 export * from "./listCustomersStatus";
 export * from "./listRevenueLogsParams";
+export * from "./loginInput";
 export * from "./overviewMetrics";
 export * from "./planBreakdownItem";
 export * from "./revenueLog";

@@ -15,6 +15,29 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
+ * @summary Sign in with email and password
+ */
+export const LoginBody = zod.object({
+  email: zod.string(),
+  password: zod.string(),
+});
+
+export const LoginResponse = zod.object({
+  id: zod.number(),
+  email: zod.string(),
+  name: zod.string(),
+});
+
+/**
+ * @summary Get the currently authenticated user
+ */
+export const GetCurrentUserResponse = zod.object({
+  id: zod.number(),
+  email: zod.string(),
+  name: zod.string(),
+});
+
+/**
  * @summary Get overview KPI cards
  */
 export const GetOverviewMetricsResponse = zod.object({
